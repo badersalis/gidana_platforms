@@ -14,20 +14,26 @@ import (
 type PropertyInput struct {
 	Title           string  `json:"title" form:"title" binding:"required"`
 	Description     string  `json:"description" form:"description"`
-	Neighborhood    string  `json:"neighborhood" form:"neighborhood" binding:"required"`
-	Country         string  `json:"country" form:"country" binding:"required"`
 	PropertyType    string  `json:"property_type" form:"property_type" binding:"required"`
 	TransactionType string  `json:"transaction_type" form:"transaction_type" binding:"required"`
+	Country         string  `json:"country" form:"country" binding:"required"`
+	City            string  `json:"city" form:"city" binding:"required"`
+	State           string  `json:"state" form:"state"`
+	Neighborhood    string  `json:"neighborhood" form:"neighborhood"`
+	ExactAddress    string  `json:"exact_address" form:"exact_address"`
+	Latitude        float64 `json:"latitude" form:"latitude"`
+	Longitude       float64 `json:"longitude" form:"longitude"`
 	Rooms           int     `json:"rooms" form:"rooms" binding:"required"`
 	Bathrooms       int     `json:"bathrooms" form:"bathrooms" binding:"required"`
 	ShowerType      string  `json:"shower_type" form:"shower_type"`
 	Surface         float64 `json:"surface" form:"surface"`
-	HasCourtyard    bool    `json:"has_courtyard" form:"has_courtyard"`
+	Furnished       bool    `json:"furnished" form:"furnished"`
+	HasWifi         bool    `json:"has_wifi" form:"has_wifi"`
 	HasWater        bool    `json:"has_water" form:"has_water"`
 	HasElectricity  bool    `json:"has_electricity" form:"has_electricity"`
-	ExactAddress    string  `json:"exact_address" form:"exact_address"`
+	HasCourtyard    bool    `json:"has_courtyard" form:"has_courtyard"`
 	Price           float64 `json:"price" form:"price" binding:"required"`
-	Currency        string  `json:"currency" form:"currency"`
+	Currency        string  `json:"currency" form:"currency" binding:"required"`
 }
 
 func ListProperties(c *gin.Context) {
@@ -42,13 +48,28 @@ func ListProperties(c *gin.Context) {
 
 	if q := c.Query("q"); q != "" {
 		like := "%" + strings.ToLower(q) + "%"
-		query = query.Where("LOWER(neighborhood) LIKE ? OR LOWER(country) LIKE ? OR LOWER(exact_address) LIKE ? OR LOWER(title) LIKE ?", like, like, like, like)
+		query = query.Where(
+			"LOWER(city) LIKE ? OR LOWER(neighborhood) LIKE ? OR LOWER(country) LIKE ? OR LOWER(state) LIKE ? OR LOWER(exact_address) LIKE ? OR LOWER(title) LIKE ?",
+			like, like, like, like, like, like,
+		)
+	}
+	if country := c.Query("country"); country != "" {
+		query = query.Where("country = ?", country)
+	}
+	if city := c.Query("city"); city != "" {
+		query = query.Where("city = ?", city)
 	}
 	if pt := c.Query("property_type"); pt != "" {
 		query = query.Where("property_type = ?", pt)
 	}
 	if tt := c.Query("transaction_type"); tt != "" {
 		query = query.Where("transaction_type = ?", tt)
+	}
+	if minPrice := c.Query("min_price"); minPrice != "" {
+		query = query.Where("price >= ?", minPrice)
+	}
+	if maxPrice := c.Query("max_price"); maxPrice != "" {
+		query = query.Where("price <= ?", maxPrice)
 	}
 
 	var total int64
@@ -88,7 +109,6 @@ func GetFeaturedProperties(c *gin.Context) {
 		rated[i] = ratedProp{props[i], props[i].AverageRating}
 	}
 
-	// Sort by rating desc (simple bubble sort for small set)
 	for i := 0; i < len(rated); i++ {
 		for j := i + 1; j < len(rated); j++ {
 			if rated[j].rating > rated[i].rating {
@@ -143,28 +163,29 @@ func CreateProperty(c *gin.Context) {
 		return
 	}
 
-	currency := input.Currency
-	if currency == "" {
-		currency = "XOF"
-	}
-
 	prop := models.Property{
 		Title:           input.Title,
 		Description:     input.Description,
-		Neighborhood:    input.Neighborhood,
-		Country:         input.Country,
 		PropertyType:    input.PropertyType,
 		TransactionType: input.TransactionType,
+		Country:         input.Country,
+		City:            input.City,
+		State:           input.State,
+		Neighborhood:    input.Neighborhood,
+		ExactAddress:    input.ExactAddress,
+		Latitude:        input.Latitude,
+		Longitude:       input.Longitude,
 		Rooms:           input.Rooms,
 		Bathrooms:       input.Bathrooms,
 		ShowerType:      input.ShowerType,
 		Surface:         input.Surface,
-		HasCourtyard:    input.HasCourtyard,
+		Furnished:       input.Furnished,
+		HasWifi:         input.HasWifi,
 		HasWater:        input.HasWater,
 		HasElectricity:  input.HasElectricity,
-		ExactAddress:    input.ExactAddress,
+		HasCourtyard:    input.HasCourtyard,
 		Price:           input.Price,
-		Currency:        currency,
+		Currency:        input.Currency,
 		OwnerID:         userID,
 		IsAvailable:     true,
 	}
@@ -222,17 +243,28 @@ func UpdateProperty(c *gin.Context) {
 	}
 
 	updates := map[string]interface{}{
-		"title": input.Title, "description": input.Description,
-		"neighborhood": input.Neighborhood, "country": input.Country,
-		"property_type": input.PropertyType, "transaction_type": input.TransactionType,
-		"rooms": input.Rooms, "bathrooms": input.Bathrooms,
-		"shower_type": input.ShowerType, "surface": input.Surface,
-		"has_courtyard": input.HasCourtyard, "has_water": input.HasWater,
-		"has_electricity": input.HasElectricity, "exact_address": input.ExactAddress,
-		"price": input.Price,
-	}
-	if input.Currency != "" {
-		updates["currency"] = input.Currency
+		"title":            input.Title,
+		"description":      input.Description,
+		"property_type":    input.PropertyType,
+		"transaction_type": input.TransactionType,
+		"country":          input.Country,
+		"city":             input.City,
+		"state":            input.State,
+		"neighborhood":     input.Neighborhood,
+		"exact_address":    input.ExactAddress,
+		"latitude":         input.Latitude,
+		"longitude":        input.Longitude,
+		"rooms":            input.Rooms,
+		"bathrooms":        input.Bathrooms,
+		"shower_type":      input.ShowerType,
+		"surface":          input.Surface,
+		"furnished":        input.Furnished,
+		"has_wifi":         input.HasWifi,
+		"has_water":        input.HasWater,
+		"has_electricity":  input.HasElectricity,
+		"has_courtyard":    input.HasCourtyard,
+		"price":            input.Price,
+		"currency":         input.Currency,
 	}
 
 	database.DB.Model(&prop).Updates(updates)
@@ -374,4 +406,3 @@ func MyProperties(c *gin.Context) {
 	}
 	utils.OK(c, props)
 }
-

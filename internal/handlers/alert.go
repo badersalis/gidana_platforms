@@ -12,11 +12,14 @@ import (
 )
 
 type AlertInput struct {
+	Country         string  `json:"country"`
+	City            string  `json:"city"`
 	Neighborhood    string  `json:"neighborhood"`
 	PropertyType    string  `json:"property_type"`
+	TransactionType string  `json:"transaction_type"` // rent, sale
 	MinRooms        int     `json:"min_rooms"`
 	MaxPrice        float64 `json:"max_price"`
-	TransactionType string  `json:"transaction_type"`
+	Currency        string  `json:"currency"` // ISO 4217
 }
 
 func GetAlerts(c *gin.Context) {
@@ -37,11 +40,14 @@ func CreateAlert(c *gin.Context) {
 
 	alert := models.Alert{
 		UserID:          userID,
+		Country:         input.Country,
+		City:            input.City,
 		Neighborhood:    input.Neighborhood,
 		PropertyType:    input.PropertyType,
+		TransactionType: input.TransactionType,
 		MinRooms:        input.MinRooms,
 		MaxPrice:        input.MaxPrice,
-		TransactionType: input.TransactionType,
+		Currency:        input.Currency,
 		IsActive:        true,
 	}
 
@@ -68,12 +74,15 @@ func UpdateAlert(c *gin.Context) {
 		return
 	}
 
-	updates := map[string]interface{}{
+	updates := map[string]any{
+		"country":          input.Country,
+		"city":             input.City,
 		"neighborhood":     input.Neighborhood,
 		"property_type":    input.PropertyType,
+		"transaction_type": input.TransactionType,
 		"min_rooms":        input.MinRooms,
 		"max_price":        input.MaxPrice,
-		"transaction_type": input.TransactionType,
+		"currency":         input.Currency,
 	}
 	if input.IsActive != nil {
 		updates["is_active"] = *input.IsActive
@@ -97,20 +106,24 @@ func DeleteAlert(c *gin.Context) {
 	utils.OK(c, gin.H{"message": "Alert deleted"})
 }
 
-// notifyMatchingAlerts finds all active alerts that match prop and notifies
+// notifyMatchingAlerts finds all active alerts matching the new property and notifies
 // their owners via WebSocket (if online) or Expo push (if offline).
-// It is called asynchronously after a new property is created.
+// Called asynchronously after a new property is created.
 func notifyMatchingAlerts(prop models.Property) {
 	var alerts []models.Alert
 	database.DB.Where(
 		`is_active = true
 		 AND user_id != ?
+		 AND (country = '' OR country = ?)
+		 AND (city = '' OR city = ?)
 		 AND (neighborhood = '' OR neighborhood = ?)
 		 AND (property_type = '' OR property_type = ?)
 		 AND (transaction_type = '' OR transaction_type = ?)
 		 AND (min_rooms = 0 OR min_rooms <= ?)
 		 AND (max_price = 0 OR max_price >= ?)`,
 		prop.OwnerID,
+		prop.Country,
+		prop.City,
 		prop.Neighborhood,
 		prop.PropertyType,
 		prop.TransactionType,
@@ -122,14 +135,15 @@ func notifyMatchingAlerts(prop models.Property) {
 		return
 	}
 
-	title := "Nouvelle propriété disponible"
-	body := fmt.Sprintf("%s à %s — %s (%.0f %s)",
-		prop.PropertyType, prop.Neighborhood, prop.TransactionType, prop.Price, prop.Currency)
+	title := "New property available"
+	body := fmt.Sprintf("%s in %s, %s — %s (%.0f %s)",
+		prop.PropertyType, prop.Neighborhood, prop.City, prop.TransactionType, prop.Price, prop.Currency)
 	data := map[string]any{"property_id": prop.ID}
 
 	event := appws.Event{Type: "property_alert", Data: map[string]any{
 		"property_id":      prop.ID,
 		"title":            prop.Title,
+		"city":             prop.City,
 		"neighborhood":     prop.Neighborhood,
 		"property_type":    prop.PropertyType,
 		"transaction_type": prop.TransactionType,

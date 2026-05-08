@@ -19,16 +19,34 @@ func GetSearchSuggestions(c *gin.Context) {
 	}
 
 	like := "%" + strings.ToLower(q) + "%"
+
+	var cities []struct{ City string }
+	database.DB.Model(&models.Property{}).
+		Select("DISTINCT city").
+		Where("LOWER(city) LIKE ?", like).
+		Limit(5).
+		Scan(&cities)
+
 	var neighborhoods []struct{ Neighborhood string }
 	database.DB.Model(&models.Property{}).
 		Select("DISTINCT neighborhood").
-		Where("LOWER(neighborhood) LIKE ?", like).
-		Limit(10).
+		Where("LOWER(neighborhood) LIKE ? AND neighborhood != ''", like).
+		Limit(5).
 		Scan(&neighborhoods)
 
-	suggestions := make([]string, 0, len(neighborhoods))
-	for _, n := range neighborhoods {
-		suggestions = append(suggestions, n.Neighborhood)
+	seen := map[string]bool{}
+	suggestions := make([]string, 0, len(cities)+len(neighborhoods))
+	for _, row := range cities {
+		if !seen[row.City] {
+			suggestions = append(suggestions, row.City)
+			seen[row.City] = true
+		}
+	}
+	for _, row := range neighborhoods {
+		if !seen[row.Neighborhood] {
+			suggestions = append(suggestions, row.Neighborhood)
+			seen[row.Neighborhood] = true
+		}
 	}
 
 	utils.OK(c, suggestions)

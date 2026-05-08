@@ -21,7 +21,7 @@ type User struct {
 	DateOfBirth    *time.Time     `json:"date_of_birth,omitempty"`
 	MemberSince    time.Time      `json:"member_since"`
 	Active         bool           `gorm:"default:true" json:"active"`
-	Locale         string         `gorm:"size:10;default:'fr'" json:"locale"`
+	Locale         string         `gorm:"size:10;default:'en'" json:"locale"`
 	Timezone       string         `gorm:"size:50;default:'UTC'" json:"timezone"`
 	ExpoPushToken  string         `gorm:"size:200" json:"-"`
 
