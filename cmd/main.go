@@ -1,9 +1,24 @@
+// @title           Gidana API
+// @version         1.0.0
+// @description     Real-estate platform API — property listings, rentals, messaging, digital wallets & payments.
+// @contact.name    Gidana Support
+// @contact.email   support@gidana.com
+// @host            localhost:8080
+// @BasePath        /api/v1
+// @schemes         http https
+
+// @securityDefinitions.apikey BearerAuth
+// @in              header
+// @name            Authorization
+// @description     Type "Bearer" followed by a space and your JWT token.
+
 package main
 
 import (
 	"log"
 	"os"
 
+	_ "github.com/badersalis/gidana_backend/docs"
 	"github.com/badersalis/gidana_backend/internal/config"
 	"github.com/badersalis/gidana_backend/internal/database"
 	"github.com/badersalis/gidana_backend/internal/routes"
@@ -36,6 +51,8 @@ func main() {
 
 	port := config.App.Port
 	log.Printf("Gidana API server starting on port %s (env: %s)", port, config.App.AppEnv)
+	log.Printf("Scalar UI  → http://localhost:%s/docs", port)
+	log.Printf("Swagger UI → http://localhost:%s/swagger/index.html", port)
 	if err := r.Run(":" + port); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}

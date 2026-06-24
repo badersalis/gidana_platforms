@@ -94,8 +94,6 @@ func migrate() {
 		&models.Review{},
 		&models.Favorite{},
 		&models.Alert{},
-		&models.Wallet{},
-		&models.Transaction{},
 		&models.SearchHistory{},
 		&models.Conversation{},
 		&models.Message{},

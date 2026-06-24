@@ -1,0 +1,1987 @@
+basePath: /api/v1
+definitions:
+  handlers.AlertListResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.Alert'
+        type: array
+      success:
+        example: true
+        type: boolean
+    type: object
+  handlers.AlertResponse:
+    properties:
+      data:
+        $ref: '#/definitions/models.Alert'
+      success:
+        example: true
+        type: boolean
+    type: object
+  handlers.AuthData:
+    properties:
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+    type: object
+  handlers.AuthResponse:
+    properties:
+      data:
+        $ref: '#/definitions/handlers.AuthData'
+      success:
+        example: true
+        type: boolean
+    type: object
+  handlers.AvailabilityResponse:
+    properties:
+      data:
+        properties:
+          is_available:
+            example: false
+            type: boolean
+        type: object
+      success:
+        example: true
+        type: boolean
+    type: object
+  handlers.ChangePasswordRequest:
+    properties:
+      current_password:
+        example: oldpass123
+        type: string
+      new_password:
+        example: newpass123
+        type: string
+    type: object
+  handlers.ConversationListResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.Conversation'
+        type: array
+      success:
+        example: true
+        type: boolean
+    type: object
+  handlers.ConversationResponse:
+    properties:
+      data:
+        $ref: '#/definitions/models.Conversation'
+      success:
+        example: true
+        type: boolean
+    type: object
+  handlers.CreateRentalRequest:
+    properties:
+      end_date:
+        example: "2027-07-01"
+        type: string
+      monthly_price:
+        example: 150000
+        type: number
+      property_id:
+        example: 42
+        type: integer
+      start_date:
+        example: "2026-07-01"
+        type: string
+    type: object
+  handlers.CreateReviewRequest:
+    properties:
+      comment:
+        example: Great location and very clean.
+        type: string
+      rating:
+        example: 4
+        maximum: 5
+        minimum: 1
+        type: integer
+    type: object
+  handlers.ErrorResponse:
+    properties:
+      error:
+        example: invalid request
+        type: string
+      success:
+        example: false
+        type: boolean
+    type: object
+  handlers.FavoriteListResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.Property'
+        type: array
+      page:
+        example: 1
+        type: integer
+      page_size:
+        example: 10
+        type: integer
+      pages:
+        example: 1
+        type: integer
+      success:
+        example: true
+        type: boolean
+      total:
+        example: 5
+        type: integer
+    type: object
+  handlers.FavoriteToggleData:
+    properties:
+      favorited:
+        example: true
+        type: boolean
+      message:
+        example: Added to favorites
+        type: string
+    type: object
+  handlers.FavoriteToggleResponse:
+    properties:
+      data:
+        $ref: '#/definitions/handlers.FavoriteToggleData'
+      success:
+        example: true
+        type: boolean
+    type: object
+  handlers.LoginRequest:
+    properties:
+      identifier:
+        example: john@example.com
+        type: string
+      password:
+        example: secret123
+        type: string
+    type: object
+  handlers.MessageResp:
+    properties:
+      data:
+        $ref: '#/definitions/models.Message'
+      success:
+        example: true
+        type: boolean
+    type: object
+  handlers.MessageResponse:
+    properties:
+      data:
+        additionalProperties:
+          type: string
+        type: object
+      success:
+        example: true
+        type: boolean
+    type: object
+  handlers.PropertyImageResponse:
+    properties:
+      data:
+        $ref: '#/definitions/models.PropertyImage'
+      success:
+        example: true
+        type: boolean
+    type: object
+  handlers.PropertyListResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.Property'
+        type: array
+      page:
+        example: 1
+        type: integer
+      page_size:
+        example: 10
+        type: integer
+      pages:
+        example: 10
+        type: integer
+      success:
+        example: true
+        type: boolean
+      total:
+        example: 100
+        type: integer
+    type: object
+  handlers.PropertyResponse:
+    properties:
+      data:
+        $ref: '#/definitions/models.Property'
+      success:
+        example: true
+        type: boolean
+    type: object
+  handlers.RegisterRequest:
+    properties:
+      email:
+        example: john@example.com
+        type: string
+      first_name:
+        example: John
+        type: string
+      last_name:
+        example: Doe
+        type: string
+      password:
+        example: secret123
+        type: string
+      phone_number:
+        example: "+237600000000"
+        type: string
+    type: object
+  handlers.RentalListResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.Rental'
+        type: array
+      success:
+        example: true
+        type: boolean
+    type: object
+  handlers.RentalResponse:
+    properties:
+      data:
+        $ref: '#/definitions/models.Rental'
+      success:
+        example: true
+        type: boolean
+    type: object
+  handlers.ReviewListResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.Review'
+        type: array
+      success:
+        example: true
+        type: boolean
+    type: object
+  handlers.ReviewResponse:
+    properties:
+      data:
+        $ref: '#/definitions/models.Review'
+      success:
+        example: true
+        type: boolean
+    type: object
+  handlers.SaveSearchHistoryRequest:
+    properties:
+      search_term:
+        example: apartment Douala
+        type: string
+    type: object
+  handlers.SearchHistoryResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.SearchHistory'
+        type: array
+      success:
+        example: true
+        type: boolean
+    type: object
+  handlers.SearchSuggestionsResponse:
+    properties:
+      data: {}
+      success:
+        example: true
+        type: boolean
+    type: object
+  handlers.SendMessageRequest:
+    properties:
+      content:
+        example: Hello, I am interested in renting this property.
+        type: string
+    type: object
+  handlers.StartConversationRequest:
+    properties:
+      message:
+        example: Is this property still available?
+        type: string
+      property_id:
+        example: 42
+        type: integer
+      recipient_id:
+        example: 5
+        type: integer
+    type: object
+  handlers.UpdateProfileRequest:
+    properties:
+      date_of_birth:
+        example: "1995-04-12"
+        type: string
+      first_name:
+        example: John
+        type: string
+      gender:
+        example: male
+        type: string
+      last_name:
+        example: Doe
+        type: string
+      locale:
+        example: en
+        type: string
+      timezone:
+        example: Africa/Douala
+        type: string
+    type: object
+  handlers.UpdatePushTokenRequest:
+    properties:
+      expo_push_token:
+        example: ExponentPushToken[...]
+        type: string
+    type: object
+  handlers.UpdateRentalStatusRequest:
+    properties:
+      status:
+        enum:
+        - pending
+        - occupied
+        - available
+        - completed
+        example: occupied
+        type: string
+    type: object
+  handlers.UserResponse:
+    properties:
+      data:
+        $ref: '#/definitions/models.User'
+      success:
+        example: true
+        type: boolean
+    type: object
+  handlers.alertInput:
+    properties:
+      city:
+        type: string
+      country:
+        type: string
+      currency:
+        type: string
+      max_price:
+        type: number
+      min_rooms:
+        type: integer
+      neighborhood:
+        type: string
+      property_type:
+        type: string
+      transaction_type:
+        type: string
+    type: object
+  models.Alert:
+    properties:
+      city:
+        type: string
+      country:
+        description: Location filters (all optional — empty means "any")
+        type: string
+      created_at:
+        type: string
+      currency:
+        description: ISO 4217
+        type: string
+      id:
+        type: integer
+      is_active:
+        type: boolean
+      max_price:
+        type: number
+      min_rooms:
+        type: integer
+      neighborhood:
+        type: string
+      property_type:
+        description: Property filters
+        type: string
+      transaction_type:
+        description: rent, sale
+        type: string
+      user_id:
+        type: integer
+    type: object
+  models.Conversation:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      initiator:
+        $ref: '#/definitions/models.User'
+      initiator_id:
+        type: integer
+      last_message:
+        $ref: '#/definitions/models.Message'
+      messages:
+        items:
+          $ref: '#/definitions/models.Message'
+        type: array
+      property:
+        $ref: '#/definitions/models.Property'
+      property_id:
+        type: integer
+      recipient:
+        $ref: '#/definitions/models.User'
+      recipient_id:
+        type: integer
+      unread_count:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  models.Message:
+    properties:
+      content:
+        type: string
+      conversation_id:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: integer
+      is_read:
+        type: boolean
+      sender:
+        $ref: '#/definitions/models.User'
+      sender_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  models.Property:
+    properties:
+      average_rating:
+        description: Computed (not stored)
+        type: number
+      bathrooms:
+        type: integer
+      city:
+        type: string
+      country:
+        description: Location — from broad to precise
+        type: string
+      created_at:
+        type: string
+      currency:
+        type: string
+      description:
+        type: string
+      exact_address:
+        type: string
+      furnished:
+        description: Amenities
+        type: boolean
+      has_courtyard:
+        type: boolean
+      has_electricity:
+        type: boolean
+      has_water:
+        type: boolean
+      has_wifi:
+        type: boolean
+      id:
+        type: integer
+      images:
+        items:
+          $ref: '#/definitions/models.PropertyImage'
+        type: array
+      is_available:
+        type: boolean
+      is_favorited:
+        type: boolean
+      latitude:
+        type: number
+      longitude:
+        type: number
+      neighborhood:
+        description: sub-area within the city (optional)
+        type: string
+      owner:
+        allOf:
+        - $ref: '#/definitions/models.User'
+        description: Relations
+      owner_id:
+        type: integer
+      price:
+        description: Pricing — ISO 4217 currency codes (KES, USD, EUR, GBP, NGN, GHS,
+          TZS, UGX …)
+        type: number
+      property_type:
+        description: Bedsitter, Studio, Apartment, Maisonette, Bungalow, Townhouse,
+          Villa, Commercial
+        type: string
+      review_count:
+        type: integer
+      reviews:
+        items:
+          $ref: '#/definitions/models.Review'
+        type: array
+      rooms:
+        description: Size & layout
+        type: integer
+      shower_type:
+        description: en_suite, shared
+        type: string
+      state:
+        description: state / county / region / province (optional)
+        type: string
+      surface:
+        description: m²
+        type: number
+      title:
+        description: Listing info
+        type: string
+      transaction_type:
+        description: rent, sale
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.PropertyImage:
+    properties:
+      created_at:
+        type: string
+      filename:
+        type: string
+      id:
+        type: integer
+      is_main:
+        type: boolean
+      property_id:
+        type: integer
+    type: object
+  models.Rental:
+    properties:
+      created_at:
+        type: string
+      end_date:
+        type: string
+      id:
+        type: integer
+      monthly_price:
+        type: number
+      property:
+        $ref: '#/definitions/models.Property'
+      property_id:
+        type: integer
+      start_date:
+        type: string
+      status:
+        description: pending, occupied, available, completed
+        type: string
+      tenant:
+        $ref: '#/definitions/models.User'
+      tenant_id:
+        type: integer
+    type: object
+  models.Review:
+    properties:
+      comment:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      is_verified:
+        type: boolean
+      property_id:
+        type: integer
+      rating:
+        description: 1-5
+        type: integer
+      user:
+        $ref: '#/definitions/models.User'
+      user_id:
+        type: integer
+    type: object
+  models.SearchHistory:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      search_term:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  models.User:
+    properties:
+      active:
+        type: boolean
+      created_at:
+        type: string
+      date_of_birth:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      gender:
+        type: string
+      id:
+        type: integer
+      last_name:
+        type: string
+      locale:
+        type: string
+      member_since:
+        type: string
+      phone_number:
+        type: string
+      profile_picture:
+        type: string
+      timezone:
+        type: string
+      updated_at:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@gidana.com
+    name: Gidana Support
+  description: Real-estate platform API — property listings, rentals, messaging, digital
+    wallets & payments.
+  title: Gidana API
+  version: 1.0.0
+paths:
+  /alerts:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.AlertListResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List the current user's property alerts
+      tags:
+      - alerts
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Alert criteria
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.alertInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.AlertResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a property alert
+      tags:
+      - alerts
+  /alerts/{id}:
+    delete:
+      parameters:
+      - description: Alert ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.MessageResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a property alert
+      tags:
+      - alerts
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Alert ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated alert criteria
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.alertInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.AlertResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a property alert
+      tags:
+      - alerts
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Login credentials
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Login with email/phone and password
+      tags:
+      - auth
+  /auth/me:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.UserResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get current authenticated user
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Registration details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Register a new user
+      tags:
+      - auth
+  /conversations:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ConversationListResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List all conversations for the current user
+      tags:
+      - conversations
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Conversation details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.StartConversationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.ConversationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Start a new conversation with another user
+      tags:
+      - conversations
+  /conversations/{id}:
+    get:
+      parameters:
+      - description: Conversation ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ConversationResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get a single conversation with its messages
+      tags:
+      - conversations
+  /conversations/{id}/messages:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Conversation ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Message content
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.SendMessageRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.MessageResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Send a message in a conversation
+      tags:
+      - conversations
+  /conversations/{id}/messages/{msgID}:
+    delete:
+      parameters:
+      - description: Conversation ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Message ID
+        in: path
+        name: msgID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.MessageResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a message
+      tags:
+      - conversations
+  /favorites:
+    get:
+      parameters:
+      - description: Page number (default 1)
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.FavoriteListResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List the current user's favourite properties (paginated)
+      tags:
+      - favorites
+  /favorites/{id}/toggle:
+    post:
+      parameters:
+      - description: Property ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.FavoriteToggleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Add or remove a property from favourites
+      tags:
+      - favorites
+  /images/{id}:
+    delete:
+      parameters:
+      - description: Image ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.MessageResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a property image
+      tags:
+      - images
+  /images/{id}/main:
+    patch:
+      parameters:
+      - description: Image ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.MessageResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Set an image as the main property photo
+      tags:
+      - images
+  /properties:
+    get:
+      parameters:
+      - description: Free-text search
+        in: query
+        name: q
+        type: string
+      - description: Country
+        in: query
+        name: country
+        type: string
+      - description: City
+        in: query
+        name: city
+        type: string
+      - description: Property type (Apartment, Studio, Bedsitter…)
+        in: query
+        name: property_type
+        type: string
+      - description: rent or sale
+        in: query
+        name: transaction_type
+        type: string
+      - description: Minimum price
+        in: query
+        name: min_price
+        type: number
+      - description: Maximum price
+        in: query
+        name: max_price
+        type: number
+      - description: Page number (default 1)
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.PropertyListResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: List properties with optional filters
+      tags:
+      - properties
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: Title
+        in: formData
+        name: title
+        required: true
+        type: string
+      - description: Description
+        in: formData
+        name: description
+        type: string
+      - description: Bedsitter | Studio | Apartment | Maisonette | Bungalow | Townhouse
+          | Villa | Commercial
+        in: formData
+        name: property_type
+        required: true
+        type: string
+      - description: rent | sale
+        in: formData
+        name: transaction_type
+        required: true
+        type: string
+      - description: Country
+        in: formData
+        name: country
+        required: true
+        type: string
+      - description: City
+        in: formData
+        name: city
+        required: true
+        type: string
+      - description: State / region
+        in: formData
+        name: state
+        type: string
+      - description: Neighborhood
+        in: formData
+        name: neighborhood
+        type: string
+      - description: Exact address
+        in: formData
+        name: exact_address
+        type: string
+      - description: Latitude
+        in: formData
+        name: latitude
+        type: number
+      - description: Longitude
+        in: formData
+        name: longitude
+        type: number
+      - description: Number of rooms
+        in: formData
+        name: rooms
+        required: true
+        type: integer
+      - description: Number of bathrooms
+        in: formData
+        name: bathrooms
+        required: true
+        type: integer
+      - description: en_suite | shared
+        in: formData
+        name: shower_type
+        type: string
+      - description: Surface area in m²
+        in: formData
+        name: surface
+        type: number
+      - description: Is furnished
+        in: formData
+        name: furnished
+        type: boolean
+      - description: Has Wi-Fi
+        in: formData
+        name: has_wifi
+        type: boolean
+      - description: Has water
+        in: formData
+        name: has_water
+        type: boolean
+      - description: Has electricity
+        in: formData
+        name: has_electricity
+        type: boolean
+      - description: Has courtyard
+        in: formData
+        name: has_courtyard
+        type: boolean
+      - description: Price
+        in: formData
+        name: price
+        required: true
+        type: number
+      - description: ISO 4217 currency code (e.g. XAF, USD)
+        in: formData
+        name: currency
+        required: true
+        type: string
+      - description: Property images (multiple)
+        in: formData
+        name: images
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.PropertyResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new property listing
+      tags:
+      - properties
+  /properties/{id}:
+    delete:
+      parameters:
+      - description: Property ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.MessageResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a property listing
+      tags:
+      - properties
+    get:
+      parameters:
+      - description: Property ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.PropertyResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Get a single property by ID
+      tags:
+      - properties
+    put:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: Property ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Title
+        in: formData
+        name: title
+        required: true
+        type: string
+      - description: Description
+        in: formData
+        name: description
+        type: string
+      - description: Property type
+        in: formData
+        name: property_type
+        required: true
+        type: string
+      - description: rent | sale
+        in: formData
+        name: transaction_type
+        required: true
+        type: string
+      - description: Country
+        in: formData
+        name: country
+        required: true
+        type: string
+      - description: City
+        in: formData
+        name: city
+        required: true
+        type: string
+      - description: State / region
+        in: formData
+        name: state
+        type: string
+      - description: Neighborhood
+        in: formData
+        name: neighborhood
+        type: string
+      - description: Exact address
+        in: formData
+        name: exact_address
+        type: string
+      - description: Latitude
+        in: formData
+        name: latitude
+        type: number
+      - description: Longitude
+        in: formData
+        name: longitude
+        type: number
+      - description: Number of rooms
+        in: formData
+        name: rooms
+        required: true
+        type: integer
+      - description: Number of bathrooms
+        in: formData
+        name: bathrooms
+        required: true
+        type: integer
+      - description: en_suite | shared
+        in: formData
+        name: shower_type
+        type: string
+      - description: Surface area in m²
+        in: formData
+        name: surface
+        type: number
+      - description: Is furnished
+        in: formData
+        name: furnished
+        type: boolean
+      - description: Has Wi-Fi
+        in: formData
+        name: has_wifi
+        type: boolean
+      - description: Has water
+        in: formData
+        name: has_water
+        type: boolean
+      - description: Has electricity
+        in: formData
+        name: has_electricity
+        type: boolean
+      - description: Has courtyard
+        in: formData
+        name: has_courtyard
+        type: boolean
+      - description: Price
+        in: formData
+        name: price
+        required: true
+        type: number
+      - description: ISO 4217 currency code
+        in: formData
+        name: currency
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.PropertyResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a property listing
+      tags:
+      - properties
+  /properties/{id}/availability:
+    patch:
+      parameters:
+      - description: Property ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.AvailabilityResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Toggle a property's availability
+      tags:
+      - properties
+  /properties/{id}/images:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: Property ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Image file
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.PropertyImageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Add an image to a property
+      tags:
+      - properties
+  /properties/{id}/reviews:
+    get:
+      parameters:
+      - description: Property ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ReviewListResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: List all reviews for a property
+      tags:
+      - reviews
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Property ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Review details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateReviewRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.ReviewResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Submit a review for a property
+      tags:
+      - reviews
+  /properties/featured:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.PropertyListResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Get featured properties
+      tags:
+      - properties
+  /properties/my/listings:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.PropertyListResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List the current user's property listings
+      tags:
+      - properties
+  /rentals:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.RentalListResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List the current user's rentals
+      tags:
+      - rentals
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Rental details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateRentalRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handlers.RentalResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a rental agreement
+      tags:
+      - rentals
+  /rentals/{id}/status:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Rental ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: New status
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateRentalStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a rental's status
+      tags:
+      - rentals
+  /reviews/{id}:
+    delete:
+      parameters:
+      - description: Review ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.MessageResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a review
+      tags:
+      - reviews
+  /search/history:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.MessageResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Clear the current user's search history
+      tags:
+      - search
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.SearchHistoryResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get the current user's search history
+      tags:
+      - search
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Search term
+        in: body
+        name: body
+        schema:
+          $ref: '#/definitions/handlers.SaveSearchHistoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.MessageResponse'
+      summary: Save a search term to history (no-op if not authenticated)
+      tags:
+      - search
+  /search/suggestions:
+    get:
+      parameters:
+      - description: Search query
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.SearchSuggestionsResponse'
+      summary: Get search auto-complete suggestions
+      tags:
+      - search
+  /users/password:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Password change payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Change the current user's password
+      tags:
+      - users
+  /users/profile:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.MessageResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Request account deletion
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Profile fields to update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update the current user's profile
+      tags:
+      - users
+  /users/profile-picture:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: Profile picture file
+        in: formData
+        name: picture
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Upload a profile picture
+      tags:
+      - users
+  /users/push-token:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Push token
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdatePushTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update the Expo push notification token
+      tags:
+      - users
+schemes:
+- http
+- https
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and your JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

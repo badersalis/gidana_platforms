@@ -15,6 +15,14 @@ func NewReviewHandler(svc services.ReviewService) *ReviewHandler {
 	return &ReviewHandler{service: svc}
 }
 
+// GetPropertyReviews godoc
+// @Summary      List all reviews for a property
+// @Tags         reviews
+// @Produce      json
+// @Param        id  path  int  true  "Property ID"
+// @Success      200  {object}  ReviewListResponse
+// @Failure      404  {object}  ErrorResponse
+// @Router       /properties/{id}/reviews [get]
 func (h *ReviewHandler) GetPropertyReviews(c *gin.Context) {
 	propID := paramUint(c, "id")
 	reviews, err := h.service.GetPropertyReviews(propID)
@@ -24,6 +32,18 @@ func (h *ReviewHandler) GetPropertyReviews(c *gin.Context) {
 	utils.OK(c, reviews)
 }
 
+// CreateReview godoc
+// @Summary      Submit a review for a property
+// @Tags         reviews
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id    path  int                 true  "Property ID"
+// @Param        body  body  CreateReviewRequest  true  "Review details"
+// @Success      201   {object}  ReviewResponse
+// @Failure      400   {object}  ErrorResponse
+// @Failure      401   {object}  ErrorResponse
+// @Router       /properties/{id}/reviews [post]
 func (h *ReviewHandler) CreateReview(c *gin.Context) {
 	userID, _ := middleware.GetUserID(c)
 	propID := paramUint(c, "id")
@@ -47,6 +67,17 @@ func (h *ReviewHandler) CreateReview(c *gin.Context) {
 	utils.Created(c, review)
 }
 
+// DeleteReview godoc
+// @Summary      Delete a review
+// @Tags         reviews
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id  path  int  true  "Review ID"
+// @Success      200  {object}  MessageResponse
+// @Failure      401  {object}  ErrorResponse
+// @Failure      403  {object}  ErrorResponse
+// @Failure      404  {object}  ErrorResponse
+// @Router       /reviews/{id} [delete]
 func (h *ReviewHandler) DeleteReview(c *gin.Context) {
 	userID, _ := middleware.GetUserID(c)
 	reviewID := paramUint(c, "id")

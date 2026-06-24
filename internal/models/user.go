@@ -25,8 +25,6 @@ type User struct {
 	Timezone       string         `gorm:"size:50;default:'UTC'" json:"timezone"`
 	ExpoPushToken  string         `gorm:"size:200" json:"-"`
 
-	Transactions  []Transaction  `gorm:"foreignKey:UserID" json:"-"`
-	Wallets       []Wallet       `gorm:"foreignKey:UserID" json:"-"`
 	Properties    []Property     `gorm:"foreignKey:OwnerID" json:"-"`
 	Favorites     []Favorite     `gorm:"foreignKey:UserID" json:"-"`
 	Alerts        []Alert        `gorm:"foreignKey:UserID" json:"-"`
