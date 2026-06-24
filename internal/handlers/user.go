@@ -15,6 +15,17 @@ func NewUserHandler(svc services.UserService) *UserHandler {
 	return &UserHandler{service: svc}
 }
 
+// UpdateProfile godoc
+// @Summary      Update the current user's profile
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        body  body      UpdateProfileRequest  true  "Profile fields to update"
+// @Success      200   {object}  UserResponse
+// @Failure      400   {object}  ErrorResponse
+// @Failure      401   {object}  ErrorResponse
+// @Router       /users/profile [put]
 func (h *UserHandler) UpdateProfile(c *gin.Context) {
 	userID, _ := middleware.GetUserID(c)
 
@@ -45,6 +56,17 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 	utils.OK(c, user)
 }
 
+// UploadProfilePicture godoc
+// @Summary      Upload a profile picture
+// @Tags         users
+// @Accept       multipart/form-data
+// @Produce      json
+// @Security     BearerAuth
+// @Param        picture  formData  file  true  "Profile picture file"
+// @Success      200      {object}  UserResponse
+// @Failure      400      {object}  ErrorResponse
+// @Failure      401      {object}  ErrorResponse
+// @Router       /users/profile-picture [post]
 func (h *UserHandler) UploadProfilePicture(c *gin.Context) {
 	userID, _ := middleware.GetUserID(c)
 
@@ -61,6 +83,17 @@ func (h *UserHandler) UploadProfilePicture(c *gin.Context) {
 	utils.OK(c, user)
 }
 
+// UpdatePushToken godoc
+// @Summary      Update the Expo push notification token
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        body  body      UpdatePushTokenRequest  true  "Push token"
+// @Success      200   {object}  MessageResponse
+// @Failure      400   {object}  ErrorResponse
+// @Failure      401   {object}  ErrorResponse
+// @Router       /users/push-token [patch]
 func (h *UserHandler) UpdatePushToken(c *gin.Context) {
 	userID, _ := middleware.GetUserID(c)
 
@@ -78,6 +111,17 @@ func (h *UserHandler) UpdatePushToken(c *gin.Context) {
 	utils.OK(c, gin.H{"message": "Push token updated"})
 }
 
+// ChangePassword godoc
+// @Summary      Change the current user's password
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        body  body      ChangePasswordRequest  true  "Password change payload"
+// @Success      200   {object}  MessageResponse
+// @Failure      400   {object}  ErrorResponse
+// @Failure      401   {object}  ErrorResponse
+// @Router       /users/password [put]
 func (h *UserHandler) ChangePassword(c *gin.Context) {
 	userID, _ := middleware.GetUserID(c)
 
@@ -96,6 +140,14 @@ func (h *UserHandler) ChangePassword(c *gin.Context) {
 	utils.OK(c, gin.H{"message": "Password changed successfully"})
 }
 
+// RequestDeleteAccount godoc
+// @Summary      Request account deletion
+// @Tags         users
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {object}  MessageResponse
+// @Failure      401  {object}  ErrorResponse
+// @Router       /users/profile [delete]
 func (h *UserHandler) RequestDeleteAccount(c *gin.Context) {
 	userID, _ := middleware.GetUserID(c)
 

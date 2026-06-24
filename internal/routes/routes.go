@@ -13,6 +13,8 @@ import (
 	appws "github.com/badersalis/gidana_backend/internal/ws"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/gorm"
 )
 
@@ -42,6 +44,29 @@ func Setup(r *gin.Engine, db *gorm.DB) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok", "version": "1.0.0"})
 	})
 
+	// ── API Docs ──────────────────────────────────────────────────────────────
+	// Swagger UI:  /swagger/index.html
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	// Scalar UI:   /docs
+	r.GET("/docs", func(c *gin.Context) {
+		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(`<!doctype html>
+<html>
+  <head>
+    <title>Gidana API – Reference</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body>
+    <script
+      id="api-reference"
+      data-url="/swagger/doc.json"
+      data-configuration='{"theme":"purple"}'></script>
+    <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+  </body>
+</html>`))
+	})
+
 	// ── Storage ───────────────────────────────────────────────────────────
 	fileStore := storage.NewFileStorage()
 
@@ -50,8 +75,6 @@ func Setup(r *gin.Engine, db *gorm.DB) {
 	propRepo   := repositories.NewPropertyRepository(db)
 	imageRepo  := repositories.NewPropertyImageRepository(db)
 	rentalRepo := repositories.NewRentalRepository(db)
-	walletRepo := repositories.NewWalletRepository(db)
-	txRepo     := repositories.NewTransactionRepository(db)
 	reviewRepo := repositories.NewReviewRepository(db)
 	convRepo   := repositories.NewConversationRepository(db)
 	msgRepo    := repositories.NewMessageRepository(db)
@@ -64,8 +87,6 @@ func Setup(r *gin.Engine, db *gorm.DB) {
 	userSvc   := services.NewUserService(userRepo, fileStore)
 	propSvc   := services.NewPropertyService(propRepo, imageRepo, favRepo, alertRepo, userRepo, fileStore, appws.H)
 	rentalSvc := services.NewRentalService(rentalRepo, propRepo)
-	walletSvc := services.NewWalletService(walletRepo)
-	txSvc     := services.NewTransactionService(walletRepo, txRepo, db)
 	reviewSvc := services.NewReviewService(reviewRepo, propRepo)
 	msgSvc    := services.NewMessageService(convRepo, msgRepo, userRepo, appws.H)
 	favSvc    := services.NewFavoriteService(favRepo, propRepo)
@@ -78,8 +99,6 @@ func Setup(r *gin.Engine, db *gorm.DB) {
 	userH   := handlers.NewUserHandler(userSvc)
 	propH   := handlers.NewPropertyHandler(propSvc)
 	rentalH := handlers.NewRentalHandler(rentalSvc)
-	walletH := handlers.NewWalletHandler(walletSvc)
-	txH     := handlers.NewTransactionHandler(txSvc)
 	reviewH := handlers.NewReviewHandler(reviewSvc)
 	msgH    := handlers.NewMessageHandler(msgSvc)
 	favH    := handlers.NewFavoriteHandler(favSvc)
@@ -144,23 +163,6 @@ func Setup(r *gin.Engine, db *gorm.DB) {
 		rentals.GET("", rentalH.GetMyRentals)
 		rentals.POST("", rentalH.CreateRental)
 		rentals.PATCH("/:id/status", rentalH.UpdateRentalStatus)
-	}
-
-	wallets := api.Group("/wallets", middleware.Auth())
-	{
-		wallets.GET("", walletH.GetWallets)
-		wallets.POST("", walletH.CreateWallet)
-		wallets.PUT("/:id", walletH.UpdateWallet)
-		wallets.DELETE("/:id", walletH.DeleteWallet)
-		wallets.PATCH("/:id/select", walletH.SelectWallet)
-		wallets.POST("/:id/refresh-balance", walletH.RefreshWalletBalance)
-	}
-
-	txs := api.Group("/transactions", middleware.Auth())
-	{
-		txs.GET("", txH.GetTransactions)
-		txs.POST("/pay-service", txH.PayService)
-		txs.POST("/transfer", txH.TransferMoney)
 	}
 
 	alerts := api.Group("/alerts", middleware.Auth())
