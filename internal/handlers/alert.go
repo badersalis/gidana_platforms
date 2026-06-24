@@ -26,6 +26,14 @@ type alertInput struct {
 	Currency        string  `json:"currency"`
 }
 
+// GetAlerts godoc
+// @Summary      List the current user's property alerts
+// @Tags         alerts
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {object}  AlertListResponse
+// @Failure      401  {object}  ErrorResponse
+// @Router       /alerts [get]
 func (h *AlertHandler) GetAlerts(c *gin.Context) {
 	userID, _ := middleware.GetUserID(c)
 	alerts, err := h.service.GetAlerts(userID)
@@ -35,6 +43,17 @@ func (h *AlertHandler) GetAlerts(c *gin.Context) {
 	utils.OK(c, alerts)
 }
 
+// CreateAlert godoc
+// @Summary      Create a property alert
+// @Tags         alerts
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        body  body      alertInput  true  "Alert criteria"
+// @Success      201   {object}  AlertResponse
+// @Failure      400   {object}  ErrorResponse
+// @Failure      401   {object}  ErrorResponse
+// @Router       /alerts [post]
 func (h *AlertHandler) CreateAlert(c *gin.Context) {
 	userID, _ := middleware.GetUserID(c)
 
@@ -60,6 +79,20 @@ func (h *AlertHandler) CreateAlert(c *gin.Context) {
 	utils.Created(c, alert)
 }
 
+// UpdateAlert godoc
+// @Summary      Update a property alert
+// @Tags         alerts
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id    path  int         true  "Alert ID"
+// @Param        body  body  alertInput  true  "Updated alert criteria"
+// @Success      200   {object}  AlertResponse
+// @Failure      400   {object}  ErrorResponse
+// @Failure      401   {object}  ErrorResponse
+// @Failure      403   {object}  ErrorResponse
+// @Failure      404   {object}  ErrorResponse
+// @Router       /alerts/{id} [put]
 func (h *AlertHandler) UpdateAlert(c *gin.Context) {
 	userID, _ := middleware.GetUserID(c)
 	alertID := paramUint(c, "id")
@@ -92,6 +125,17 @@ func (h *AlertHandler) UpdateAlert(c *gin.Context) {
 	utils.OK(c, alert)
 }
 
+// DeleteAlert godoc
+// @Summary      Delete a property alert
+// @Tags         alerts
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id  path  int  true  "Alert ID"
+// @Success      200  {object}  MessageResponse
+// @Failure      401  {object}  ErrorResponse
+// @Failure      403  {object}  ErrorResponse
+// @Failure      404  {object}  ErrorResponse
+// @Router       /alerts/{id} [delete]
 func (h *AlertHandler) DeleteAlert(c *gin.Context) {
 	userID, _ := middleware.GetUserID(c)
 	alertID := paramUint(c, "id")
