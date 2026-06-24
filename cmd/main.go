@@ -32,7 +32,7 @@ func main() {
 	r := gin.Default()
 	r.SetTrustedProxies(nil)
 
-	routes.Setup(r)
+	routes.Setup(r, database.DB)
 
 	port := config.App.Port
 	log.Printf("Gidana API server starting on port %s (env: %s)", port, config.App.AppEnv)
