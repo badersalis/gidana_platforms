@@ -16,23 +16,23 @@ func NewMessageHandler(svc services.MessageService) *MessageHandler {
 }
 
 // StartConversation godoc
-// @Summary      Start a new conversation with another user
+// @Summary      Start or retrieve a conversation about a property
 // @Tags         conversations
 // @Accept       json
 // @Produce      json
 // @Security     BearerAuth
-// @Param        body  body      StartConversationRequest  true  "Conversation details"
-// @Success      201   {object}  ConversationResponse
+// @Param        body  body      StartConversationRequest  true  "Property to contact owner about"
+// @Success      200   {object}  ConversationResponse
 // @Failure      400   {object}  ErrorResponse
 // @Failure      401   {object}  ErrorResponse
+// @Failure      404   {object}  ErrorResponse
 // @Router       /conversations [post]
 func (h *MessageHandler) StartConversation(c *gin.Context) {
 	userID, _ := middleware.GetUserID(c)
 
 	var input struct {
-		RecipientID uint   `json:"recipient_id" binding:"required"`
-		PropertyID  *uint  `json:"property_id"`
-		Message     string `json:"message" binding:"required,min=1"`
+		PropertyID uint   `json:"property_id" binding:"required"`
+		Message    string `json:"message"`
 	}
 	if err := c.ShouldBindJSON(&input); err != nil {
 		utils.BadRequest(c, err.Error())
@@ -40,14 +40,13 @@ func (h *MessageHandler) StartConversation(c *gin.Context) {
 	}
 
 	conv, err := h.service.StartConversation(userID, services.StartConversationInput{
-		RecipientID: input.RecipientID,
-		PropertyID:  input.PropertyID,
-		Message:     input.Message,
+		PropertyID: input.PropertyID,
+		Message:    input.Message,
 	})
 	if handleErr(c, err) {
 		return
 	}
-	utils.Created(c, conv)
+	utils.OK(c, conv)
 }
 
 // GetConversations godoc

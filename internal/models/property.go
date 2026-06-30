@@ -58,9 +58,11 @@ type Property struct {
 	Favorites []Favorite      `gorm:"foreignKey:PropertyID;constraint:OnDelete:CASCADE" json:"-"`
 
 	// Computed (not stored)
-	AverageRating float64 `gorm:"-" json:"average_rating"`
-	ReviewCount   int     `gorm:"-" json:"review_count"`
-	IsFavorited   bool    `gorm:"-" json:"is_favorited"`
+	AverageRating   float64 `gorm:"-" json:"average_rating"`
+	ReviewCount     int     `gorm:"-" json:"review_count"`
+	IsFavorited     bool    `gorm:"-" json:"is_favorited"`
+	ContactPhone    *string `gorm:"-" json:"phone_contact"`
+	ContactWhatsapp *string `gorm:"-" json:"whatsapp_contact"`
 }
 
 func (p *Property) ComputeRating() {

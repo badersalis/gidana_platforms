@@ -372,10 +372,10 @@ const docTemplate = `{
                 "tags": [
                     "conversations"
                 ],
-                "summary": "Start a new conversation with another user",
+                "summary": "Start or retrieve a conversation about a property",
                 "parameters": [
                     {
-                        "description": "Conversation details",
+                        "description": "Property to contact owner about",
                         "name": "body",
                         "in": "body",
                         "required": true,
@@ -385,8 +385,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/handlers.ConversationResponse"
                         }
@@ -399,6 +399,12 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/handlers.ErrorResponse"
                         }
@@ -1875,6 +1881,106 @@ const docTemplate = `{
                 }
             }
         },
+        "/subscriptions/landlord-upgrade": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "subscriptions"
+                ],
+                "summary": "Upgrade landlord subscription plan",
+                "parameters": [
+                    {
+                        "description": "Landlord plan upgrade details",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UpgradeLandlordPlanRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UpgradePlanResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/subscriptions/upgrade": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "subscriptions"
+                ],
+                "summary": "Upgrade seeker subscription plan",
+                "parameters": [
+                    {
+                        "description": "Plan upgrade details",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UpgradePlanRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UpgradePlanResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/users/password": {
             "put": {
                 "security": [
@@ -2094,6 +2200,43 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/webhooks/cinetpay": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "webhooks"
+                ],
+                "summary": "CinetPay payment webhook",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "HMAC-SHA256 signature of raw request body",
+                        "name": "X-CINETPAY-SIGNATURE",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.MessageResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/handlers.ErrorResponse"
                         }
@@ -2544,10 +2687,6 @@ const docTemplate = `{
                 "property_id": {
                     "type": "integer",
                     "example": 42
-                },
-                "recipient_id": {
-                    "type": "integer",
-                    "example": 5
                 }
             }
         },
@@ -2601,6 +2740,71 @@ const docTemplate = `{
                         "completed"
                     ],
                     "example": "occupied"
+                }
+            }
+        },
+        "handlers.UpgradeLandlordPlanRequest": {
+            "type": "object",
+            "properties": {
+                "currency": {
+                    "type": "string",
+                    "enum": [
+                        "XOF",
+                        "USD"
+                    ],
+                    "example": "XOF"
+                },
+                "plan": {
+                    "type": "string",
+                    "enum": [
+                        "standard",
+                        "agency"
+                    ],
+                    "example": "standard"
+                }
+            }
+        },
+        "handlers.UpgradePlanRequest": {
+            "type": "object",
+            "properties": {
+                "currency": {
+                    "type": "string",
+                    "enum": [
+                        "XOF",
+                        "USD"
+                    ],
+                    "example": "XOF"
+                },
+                "plan": {
+                    "type": "string",
+                    "enum": [
+                        "essential",
+                        "pro"
+                    ],
+                    "example": "pro"
+                }
+            }
+        },
+        "handlers.UpgradePlanResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/handlers.UpgradePlanResponseData"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "handlers.UpgradePlanResponseData": {
+            "type": "object",
+            "properties": {
+                "transaction": {
+                    "$ref": "#/definitions/models.Transaction"
+                },
+                "user": {
+                    "$ref": "#/definitions/models.User"
                 }
             }
         },
@@ -2844,6 +3048,9 @@ const docTemplate = `{
                 "owner_id": {
                     "type": "integer"
                 },
+                "phone_contact": {
+                    "type": "string"
+                },
                 "price": {
                     "description": "Pricing — ISO 4217 currency codes (KES, USD, EUR, GBP, NGN, GHS, TZS, UGX …)",
                     "type": "number"
@@ -2886,6 +3093,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updated_at": {
+                    "type": "string"
+                },
+                "whatsapp_contact": {
                     "type": "string"
                 }
             }
@@ -2993,6 +3203,54 @@ const docTemplate = `{
                 }
             }
         },
+        "models.Transaction": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "cinetpay_transaction_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "currency": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "nature": {
+                    "type": "string"
+                },
+                "plan": {
+                    "type": "string"
+                },
+                "service": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/models.TransactionStatus"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.TransactionStatus": {
+            "type": "string",
+            "enum": [
+                "done",
+                "failed",
+                "ongoing"
+            ],
+            "x-enum-varnames": [
+                "TransactionDone",
+                "TransactionFailed",
+                "TransactionOngoing"
+            ]
+        },
         "models.User": {
             "type": "object",
             "properties": {
@@ -3017,6 +3275,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "landlord_plan": {
+                    "type": "string"
+                },
                 "last_name": {
                     "type": "string"
                 },
@@ -3030,6 +3291,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "profile_picture": {
+                    "type": "string"
+                },
+                "subscription_expires_at": {
+                    "type": "string"
+                },
+                "subscription_plan": {
                     "type": "string"
                 },
                 "timezone": {

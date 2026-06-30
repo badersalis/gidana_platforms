@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"mime/multipart"
 
+	"github.com/badersalis/gidana_backend/internal/config"
 	"github.com/badersalis/gidana_backend/internal/models"
 	"github.com/badersalis/gidana_backend/internal/repositories"
 	"github.com/badersalis/gidana_backend/internal/storage"
@@ -139,6 +140,14 @@ func (s *propertyService) GetProperty(id uint, userID uint, loggedIn bool) (*mod
 		if exists, _ := s.favRepo.ExistsForUserAndProperty(userID, prop.ID); exists {
 			prop.IsFavorited = true
 		}
+		// Expose contact info only to the owner or seeker with "pro" plan
+		viewer, _ := s.userRepo.GetByID(userID)
+		if viewer != nil && (prop.OwnerID == userID || viewer.SubscriptionPlan == "pro") {
+			phone := prop.PhoneContact
+			whatsapp := prop.WhatsappContact
+			prop.ContactPhone = &phone
+			prop.ContactWhatsapp = &whatsapp
+		}
 	}
 	return prop, nil
 }
@@ -186,6 +195,19 @@ func (s *propertyService) GetMyProperties(userID uint) ([]models.Property, error
 func (s *propertyService) CreateProperty(input CreatePropertyInput, userID uint) (*models.Property, error) {
 	if len(input.Images) < 3 {
 		return nil, ErrBadRequest("At least 3 images are required")
+	}
+
+	// Enforce per-plan listing limit
+	owner, err := s.userRepo.GetByID(userID)
+	if err != nil {
+		return nil, ErrInternal("Failed to fetch user")
+	}
+	limit := config.GetListingLimit(owner.LandlordPlan)
+	if limit >= 0 {
+		count, _ := s.propRepo.CountActiveByOwner(userID)
+		if int(count) >= limit {
+			return nil, ErrForbidden("listing_limit_reached")
+		}
 	}
 
 	prop := &models.Property{

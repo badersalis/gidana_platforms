@@ -32,7 +32,7 @@ func Setup(r *gin.Engine, db *gorm.DB) {
 			return allowedOrigins[origin] || allowedOrigins["*"]
 		},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "X-CINETPAY-SIGNATURE"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           86400,
@@ -45,10 +45,8 @@ func Setup(r *gin.Engine, db *gorm.DB) {
 	})
 
 	// ── API Docs ──────────────────────────────────────────────────────────────
-	// Swagger UI:  /swagger/index.html
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	// Scalar UI:   /docs
 	r.GET("/docs", func(c *gin.Context) {
 		c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(`<!doctype html>
 <html>
@@ -81,6 +79,7 @@ func Setup(r *gin.Engine, db *gorm.DB) {
 	favRepo    := repositories.NewFavoriteRepository(db)
 	alertRepo  := repositories.NewAlertRepository(db)
 	searchRepo := repositories.NewSearchRepository(db)
+	txRepo     := repositories.NewTransactionRepository(db)
 
 	// ── Services ──────────────────────────────────────────────────────────
 	authSvc   := services.NewAuthService(userRepo)
@@ -88,24 +87,27 @@ func Setup(r *gin.Engine, db *gorm.DB) {
 	propSvc   := services.NewPropertyService(propRepo, imageRepo, favRepo, alertRepo, userRepo, fileStore, appws.H)
 	rentalSvc := services.NewRentalService(rentalRepo, propRepo)
 	reviewSvc := services.NewReviewService(reviewRepo, propRepo)
-	msgSvc    := services.NewMessageService(convRepo, msgRepo, userRepo, appws.H)
+	msgSvc    := services.NewMessageService(convRepo, msgRepo, userRepo, propRepo, appws.H)
 	favSvc    := services.NewFavoriteService(favRepo, propRepo)
 	alertSvc  := services.NewAlertService(alertRepo)
 	searchSvc := services.NewSearchService(searchRepo)
+	subsSvc   := services.NewSubscriptionService(userRepo, txRepo)
 
 	// ── Handlers ──────────────────────────────────────────────────────────
-	authH   := handlers.NewAuthHandler(authSvc)
-	wsH     := handlers.NewWSHandler(appws.H)
-	userH   := handlers.NewUserHandler(userSvc)
-	propH   := handlers.NewPropertyHandler(propSvc)
-	rentalH := handlers.NewRentalHandler(rentalSvc)
-	reviewH := handlers.NewReviewHandler(reviewSvc)
-	msgH    := handlers.NewMessageHandler(msgSvc)
-	favH    := handlers.NewFavoriteHandler(favSvc)
-	alertH  := handlers.NewAlertHandler(alertSvc)
-	searchH := handlers.NewSearchHandler(searchSvc)
+	authH    := handlers.NewAuthHandler(authSvc)
+	wsH      := handlers.NewWSHandler(appws.H)
+	userH    := handlers.NewUserHandler(userSvc)
+	propH    := handlers.NewPropertyHandler(propSvc)
+	rentalH  := handlers.NewRentalHandler(rentalSvc)
+	reviewH  := handlers.NewReviewHandler(reviewSvc)
+	msgH     := handlers.NewMessageHandler(msgSvc)
+	favH     := handlers.NewFavoriteHandler(favSvc)
+	alertH   := handlers.NewAlertHandler(alertSvc)
+	searchH  := handlers.NewSearchHandler(searchSvc)
+	subsH    := handlers.NewSubscriptionHandler(subsSvc)
+	webhookH := handlers.NewWebhookHandler(subsSvc)
 
-	// ── Routes (paths unchanged) ───────────────────────────────────────────
+	// ── Routes ────────────────────────────────────────────────────────────
 	api := r.Group("/api/v1")
 
 	auth := api.Group("/auth")
@@ -189,4 +191,12 @@ func Setup(r *gin.Engine, db *gorm.DB) {
 		search.GET("/history", middleware.Auth(), searchH.GetSearchHistory)
 		search.DELETE("/history", middleware.Auth(), searchH.DeleteSearchHistory)
 	}
+
+	subs := api.Group("/subscriptions", middleware.Auth())
+	{
+		subs.POST("/upgrade", subsH.UpgradePlan)
+		subs.POST("/landlord-upgrade", subsH.UpgradeLandlordPlan)
+	}
+
+	api.POST("/webhooks/cinetpay", webhookH.HandleCinetPay)
 }
