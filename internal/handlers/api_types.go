@@ -47,9 +47,18 @@ type UpdateRentalStatusRequest struct {
 }
 
 type StartConversationRequest struct {
-	RecipientID uint   `json:"recipient_id" example:"5"`
-	PropertyID  *uint  `json:"property_id" example:"42"`
-	Message     string `json:"message" example:"Is this property still available?"`
+	PropertyID uint   `json:"property_id" example:"42"`
+	Message    string `json:"message" example:"Is this property still available?"`
+}
+
+type UpgradePlanRequest struct {
+	Plan     string `json:"plan" example:"pro" enums:"essential,pro"`
+	Currency string `json:"currency" example:"XOF" enums:"XOF,USD"`
+}
+
+type UpgradeLandlordPlanRequest struct {
+	Plan     string `json:"plan" example:"standard" enums:"standard,agency"`
+	Currency string `json:"currency" example:"XOF" enums:"XOF,USD"`
 }
 
 type SendMessageRequest struct {
@@ -199,6 +208,18 @@ type SearchSuggestionsResponse struct {
 type SearchHistoryResponse struct {
 	Success bool                   `json:"success" example:"true"`
 	Data    []models.SearchHistory `json:"data"`
+}
+
+// Subscriptions
+
+type UpgradePlanResponse struct {
+	Success bool                   `json:"success" example:"true"`
+	Data    UpgradePlanResponseData `json:"data"`
+}
+
+type UpgradePlanResponseData struct {
+	Transaction models.Transaction `json:"transaction"`
+	User        models.User        `json:"user"`
 }
 
 type AvailabilityResponse struct {

@@ -22,6 +22,7 @@ type PropertyRepository interface {
 	GetByID(id uint) (*models.Property, error)
 	GetFeatured() ([]models.Property, error)
 	GetByOwnerID(ownerID uint) ([]models.Property, error)
+	CountActiveByOwner(ownerID uint) (int64, error)
 	Create(prop *models.Property) error
 	Update(prop *models.Property, updates map[string]interface{}) error
 	Delete(prop *models.Property) error
@@ -93,6 +94,12 @@ func (r *propertyRepository) GetByOwnerID(ownerID uint) ([]models.Property, erro
 	var props []models.Property
 	err := r.db.Where("owner_id = ?", ownerID).Preload("Images").Find(&props).Error
 	return props, err
+}
+
+func (r *propertyRepository) CountActiveByOwner(ownerID uint) (int64, error) {
+	var count int64
+	err := r.db.Model(&models.Property{}).Where("owner_id = ? AND is_available = ?", ownerID, true).Count(&count).Error
+	return count, err
 }
 
 func (r *propertyRepository) Create(prop *models.Property) error {

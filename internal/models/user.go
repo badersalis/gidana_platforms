@@ -25,12 +25,16 @@ type User struct {
 	Timezone       string         `gorm:"size:50;default:'UTC'" json:"timezone"`
 	ExpoPushToken  string         `gorm:"size:200" json:"-"`
 
-	Properties    []Property     `gorm:"foreignKey:OwnerID" json:"-"`
+	SubscriptionPlan      string     `gorm:"size:20;default:'basic'" json:"subscription_plan"`
+	LandlordPlan          string     `gorm:"size:20;default:'free'" json:"landlord_plan"`
+	SubscriptionExpiresAt *time.Time `json:"subscription_expires_at,omitempty"`
+
+	Properties    []Property      `gorm:"foreignKey:OwnerID" json:"-"`
 	Favorites     []Favorite     `gorm:"foreignKey:UserID" json:"-"`
 	Alerts        []Alert        `gorm:"foreignKey:UserID" json:"-"`
 	Rentals       []Rental       `gorm:"foreignKey:TenantID" json:"-"`
 	Reviews       []Review       `gorm:"foreignKey:UserID" json:"-"`
-	SearchHistory []SearchHistory `gorm:"foreignKey:UserID" json:"-"`
+	SearchHistory  []SearchHistory `gorm:"foreignKey:UserID" json:"-"`
 }
 
 func (u *User) CanReviewProperty(propertyID uint) bool {

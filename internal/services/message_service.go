@@ -11,9 +11,8 @@ import (
 )
 
 type StartConversationInput struct {
-	RecipientID uint
-	PropertyID  *uint
-	Message     string
+	PropertyID uint
+	Message    string
 }
 
 type MessageService interface {
@@ -28,6 +27,7 @@ type messageService struct {
 	convRepo repositories.ConversationRepository
 	msgRepo  repositories.MessageRepository
 	userRepo repositories.UserRepository
+	propRepo repositories.PropertyRepository
 	hub      *appws.Hub
 }
 
@@ -35,9 +35,10 @@ func NewMessageService(
 	convRepo repositories.ConversationRepository,
 	msgRepo repositories.MessageRepository,
 	userRepo repositories.UserRepository,
+	propRepo repositories.PropertyRepository,
 	hub *appws.Hub,
 ) MessageService {
-	return &messageService{convRepo: convRepo, msgRepo: msgRepo, userRepo: userRepo, hub: hub}
+	return &messageService{convRepo: convRepo, msgRepo: msgRepo, userRepo: userRepo, propRepo: propRepo, hub: hub}
 }
 
 func (s *messageService) notifyRecipient(recipientID uint, senderName string, msg models.Message) {
@@ -47,8 +48,8 @@ func (s *messageService) notifyRecipient(recipientID uint, senderName string, ms
 		if recipient, err := s.userRepo.GetByIDWithToken(recipientID); err == nil && recipient.ExpoPushToken != "" {
 			utils.SendExpoPush(
 				recipient.ExpoPushToken,
-				senderName,
-				msg.Content,
+				fmt.Sprintf("%s vous a répondu", senderName),
+				"",
 				map[string]any{"conversation_id": msg.ConversationID},
 			)
 		}
@@ -56,19 +57,22 @@ func (s *messageService) notifyRecipient(recipientID uint, senderName string, ms
 }
 
 func (s *messageService) StartConversation(userID uint, input StartConversationInput) (*models.Conversation, error) {
-	if input.RecipientID == userID {
-		return nil, ErrBadRequest("Cannot start a conversation with yourself")
+	prop, err := s.propRepo.GetByID(input.PropertyID)
+	if err != nil {
+		return nil, ErrNotFound("Property not found")
 	}
-	if _, err := s.userRepo.GetByID(input.RecipientID); err != nil {
-		return nil, ErrNotFound("Recipient not found")
+	recipientID := prop.OwnerID
+	if recipientID == userID {
+		return nil, ErrBadRequest("Cannot start a conversation about your own property")
 	}
 
-	conv, err := s.convRepo.FindBetweenUsers(userID, input.RecipientID, input.PropertyID)
+	propIDPtr := &input.PropertyID
+	conv, err := s.convRepo.FindBetweenUsers(userID, recipientID, propIDPtr)
 	if err == gorm.ErrRecordNotFound || conv == nil {
 		conv = &models.Conversation{
 			InitiatorID: userID,
-			RecipientID: input.RecipientID,
-			PropertyID:  input.PropertyID,
+			RecipientID: recipientID,
+			PropertyID:  propIDPtr,
 		}
 		if err := s.convRepo.Create(conv); err != nil {
 			return nil, ErrInternal("Failed to create conversation")
@@ -77,23 +81,24 @@ func (s *messageService) StartConversation(userID uint, input StartConversationI
 		return nil, ErrInternal("Failed to find conversation")
 	}
 
-	msg := &models.Message{
-		ConversationID: conv.ID,
-		SenderID:       userID,
-		Content:        input.Message,
+	if input.Message != "" {
+		msg := &models.Message{
+			ConversationID: conv.ID,
+			SenderID:       userID,
+			Content:        input.Message,
+		}
+		s.msgRepo.Create(msg)
+		s.convRepo.TouchUpdatedAt(conv.ID)
+		s.msgRepo.ReloadWithSender(msg)
+
+		senderName := fmt.Sprintf("%s %s", msg.Sender.FirstName, msg.Sender.LastName)
+		go s.notifyRecipient(recipientID, senderName, *msg)
 	}
-	s.msgRepo.Create(msg)
-	s.convRepo.TouchUpdatedAt(conv.ID)
-	s.msgRepo.ReloadWithSender(msg)
 
 	full, err := s.convRepo.GetWithMessages(conv.ID)
 	if err != nil {
 		return nil, ErrInternal("Failed to load conversation")
 	}
-
-	senderName := fmt.Sprintf("%s %s", msg.Sender.FirstName, msg.Sender.LastName)
-	go s.notifyRecipient(input.RecipientID, senderName, *msg)
-
 	return full, nil
 }
 

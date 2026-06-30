@@ -303,9 +303,6 @@ definitions:
       property_id:
         example: 42
         type: integer
-      recipient_id:
-        example: 5
-        type: integer
     type: object
   handlers.UpdateProfileRequest:
     properties:
@@ -344,6 +341,51 @@ definitions:
         - completed
         example: occupied
         type: string
+    type: object
+  handlers.UpgradeLandlordPlanRequest:
+    properties:
+      currency:
+        enum:
+        - XOF
+        - USD
+        example: XOF
+        type: string
+      plan:
+        enum:
+        - standard
+        - agency
+        example: standard
+        type: string
+    type: object
+  handlers.UpgradePlanRequest:
+    properties:
+      currency:
+        enum:
+        - XOF
+        - USD
+        example: XOF
+        type: string
+      plan:
+        enum:
+        - essential
+        - pro
+        example: pro
+        type: string
+    type: object
+  handlers.UpgradePlanResponse:
+    properties:
+      data:
+        $ref: '#/definitions/handlers.UpgradePlanResponseData'
+      success:
+        example: true
+        type: boolean
+    type: object
+  handlers.UpgradePlanResponseData:
+    properties:
+      transaction:
+        $ref: '#/definitions/models.Transaction'
+      user:
+        $ref: '#/definitions/models.User'
     type: object
   handlers.UserResponse:
     properties:
@@ -505,6 +547,8 @@ definitions:
         description: Relations
       owner_id:
         type: integer
+      phone_contact:
+        type: string
       price:
         description: Pricing — ISO 4217 currency codes (KES, USD, EUR, GBP, NGN, GHS,
           TZS, UGX …)
@@ -538,6 +582,8 @@ definitions:
         description: rent, sale
         type: string
       updated_at:
+        type: string
+      whatsapp_contact:
         type: string
     type: object
   models.PropertyImage:
@@ -608,6 +654,39 @@ definitions:
       user_id:
         type: integer
     type: object
+  models.Transaction:
+    properties:
+      amount:
+        type: number
+      cinetpay_transaction_id:
+        type: string
+      created_at:
+        type: string
+      currency:
+        type: string
+      id:
+        type: integer
+      nature:
+        type: string
+      plan:
+        type: string
+      service:
+        type: string
+      status:
+        $ref: '#/definitions/models.TransactionStatus'
+      user_id:
+        type: integer
+    type: object
+  models.TransactionStatus:
+    enum:
+    - done
+    - failed
+    - ongoing
+    type: string
+    x-enum-varnames:
+    - TransactionDone
+    - TransactionFailed
+    - TransactionOngoing
   models.User:
     properties:
       active:
@@ -624,6 +703,8 @@ definitions:
         type: string
       id:
         type: integer
+      landlord_plan:
+        type: string
       last_name:
         type: string
       locale:
@@ -633,6 +714,10 @@ definitions:
       phone_number:
         type: string
       profile_picture:
+        type: string
+      subscription_expires_at:
+        type: string
+      subscription_plan:
         type: string
       timezone:
         type: string
@@ -866,7 +951,7 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: Conversation details
+      - description: Property to contact owner about
         in: body
         name: body
         required: true
@@ -875,8 +960,8 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
             $ref: '#/definitions/handlers.ConversationResponse'
         "400":
@@ -887,9 +972,13 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
       security:
       - BearerAuth: []
-      summary: Start a new conversation with another user
+      summary: Start or retrieve a conversation about a property
       tags:
       - conversations
   /conversations/{id}:
@@ -1835,6 +1924,68 @@ paths:
       summary: Get search auto-complete suggestions
       tags:
       - search
+  /subscriptions/landlord-upgrade:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Landlord plan upgrade details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpgradeLandlordPlanRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.UpgradePlanResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Upgrade landlord subscription plan
+      tags:
+      - subscriptions
+  /subscriptions/upgrade:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Plan upgrade details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpgradePlanRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.UpgradePlanResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Upgrade seeker subscription plan
+      tags:
+      - subscriptions
   /users/password:
     put:
       consumes:
@@ -1975,6 +2126,30 @@ paths:
       summary: Update the Expo push notification token
       tags:
       - users
+  /webhooks/cinetpay:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: HMAC-SHA256 signature of raw request body
+        in: header
+        name: X-CINETPAY-SIGNATURE
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: CinetPay payment webhook
+      tags:
+      - webhooks
 schemes:
 - http
 - https

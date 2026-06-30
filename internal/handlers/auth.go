@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/badersalis/gidana_backend/internal/middleware"
 	"github.com/badersalis/gidana_backend/internal/services"
 	"github.com/badersalis/gidana_backend/internal/utils"
 	"github.com/gin-gonic/gin"
@@ -85,6 +86,10 @@ func (h *AuthHandler) Login(c *gin.Context) {
 // @Failure      401  {object}  ErrorResponse
 // @Router       /auth/me [get]
 func (h *AuthHandler) GetMe(c *gin.Context) {
-	user, _ := c.Get("user")
+	userID, _ := middleware.GetUserID(c)
+	user, err := h.service.GetMe(userID)
+	if handleErr(c, err) {
+		return
+	}
 	utils.OK(c, user)
 }

@@ -26,6 +26,7 @@ type RegisterInput struct {
 type AuthService interface {
 	Register(input RegisterInput) (*models.User, string, error)
 	Login(identifier, password string) (*models.User, string, error)
+	GetMe(userID uint) (*models.User, error)
 }
 
 type authService struct {
@@ -86,6 +87,24 @@ func (s *authService) Register(input RegisterInput) (*models.User, string, error
 
 	token, _ := utils.GenerateToken(user.ID, user.Email)
 	return user, token, nil
+}
+
+func (s *authService) GetMe(userID uint) (*models.User, error) {
+	user, err := s.repo.GetByID(userID)
+	if err != nil {
+		return nil, ErrNotFound("User not found")
+	}
+	if user.SubscriptionExpiresAt != nil && user.SubscriptionExpiresAt.Before(time.Now()) {
+		_ = s.repo.Update(userID, map[string]interface{}{
+			"subscription_plan":       "basic",
+			"landlord_plan":           "free",
+			"subscription_expires_at": nil,
+		})
+		user.SubscriptionPlan = "basic"
+		user.LandlordPlan = "free"
+		user.SubscriptionExpiresAt = nil
+	}
+	return user, nil
 }
 
 func (s *authService) Login(identifier, password string) (*models.User, string, error) {
